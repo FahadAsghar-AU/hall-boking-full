@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hall Booking System — Book Your Hall in Islamabad</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Top Navigation Bar -->
+  <header class="navbar">
+    <div class="container navbar-inner">
+      <a href="#" class="brand" id="nav-brand-home">
+        <span class="brand-icon" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect>
+            <path d="M9 22v-4h6v4"></path>
+            <path d="M8 6h.01"></path><path d="M16 6h.01"></path><path d="M12 6h.01"></path>
+            <path d="M12 10h.01"></path><path d="M12 14h.01"></path>
+            <path d="M16 10h.01"></path><path d="M16 14h.01"></path>
+            <path d="M8 10h.01"></path><path d="M8 14h.01"></path>
+          </svg>
+        </span>
+        <span class="brand-text">Hall Booking System</span>
+      </a>
+
+      <nav class="nav-links" aria-label="Main Navigation">
+        <button type="button" class="nav-link-btn active" id="nav-home-btn">Home</button>
+        <button type="button" class="nav-link-btn" id="nav-all-halls-btn">All 10 Halls</button>
+        <button type="button" class="nav-link-btn" id="nav-matrix-btn">Availability Matrix</button>
+        <button type="button" class="nav-link-btn" id="nav-reservations-btn">Your Reservations</button>
+      </nav>
+
+      <button type="button" id="nav-cta-btn" class="btn btn-dark">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        Find a Hall
+      </button>
+    </div>
+  </header>
+
+  <!-- Backend Connection Banner -->
+  <div id="connection-banner" class="connection-banner hidden" role="alert">
+    <div class="container connection-banner-inner">
+      <span>
+        <strong>Backend Offline:</strong> Could not connect to C++ server at <code>http://localhost:8080</code>.
+        Start <code>Hall_Booking_System.exe</code> and choose <strong>[1] Start HTTP Server</strong>.
+      </span>
+      <button id="retry-connection-btn" type="button" class="btn btn-outline-sm">Retry Connection</button>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+
+  <main class="container main-content">
+    <!-- ==================== VIEW 1: HOME SCREEN ==================== -->
+    <div id="view-home">
+      <!-- Centered Hero & Search Bar -->
+      <section class="hero-section">
+        <h1 class="hero-title">BOOK YOUR HALL</h1>
+        <p class="hero-subtitle">
+          Enter an Islamabad sector and apply filters to find available halls ranked from exact to closest match.
+        </p>
+
+        <form id="home-search-form" class="card search-hero-card" novalidate>
+          <div class="search-main-row">
+            <div class="form-group search-sector-group">
+              <label for="search-sector">Islamabad Sector <span class="req">*</span></label>
+              <input
+                id="search-sector"
+                type="text"
+                class="form-control"
+                list="sector-suggestions"
+                placeholder="Enter sector (e.g., F-7, E-11, G-11, F-10, I-8)"
+                value="F-7"
+              />
+              <datalist id="sector-suggestions">
+                <option value="F-7"></option>
+                <option value="E-11"></option>
+                <option value="G-11"></option>
+                <option value="F-10"></option>
+                <option value="I-8"></option>
+                <option value="F-8"></option>
+                <option value="G-9"></option>
+              </datalist>
+            </div>
+
+            <div class="form-group">
+              <label for="search-guests">Number of Guests</label>
+              <input id="search-guests" type="number" class="form-control" value="250" min="1" max="1000" placeholder="e.g., 250" />
+            </div>
+
+            <div class="form-group">
+              <label for="search-budget">Max Base Rent (Rs.)</label>
+              <input id="search-budget" type="number" class="form-control" value="250000" min="50000" step="10000" placeholder="e.g., 250000" />
+            </div>
+          </div>
+
+          <div class="search-filters-row">
+            <div class="form-group">
+              <label for="search-day">Day</label>
+              <select id="search-day" class="form-control"></select>
+            </div>
+            <div class="form-group">
+              <label for="search-month">Month</label>
+              <select id="search-month" class="form-control"></select>
+            </div>
+            <div class="form-group">
+              <label for="search-year">Year</label>
+              <select id="search-year" class="form-control"></select>
+            </div>
+            <div class="form-group">
+              <label for="search-slot">Time Slot</label>
+              <select id="search-slot" class="form-control">
+                <option value="0">Any Available Slot</option>
+                <option value="1">Morning (09:00 AM – 02:00 PM)</option>
+                <option value="2">Evening (03:00 PM – 07:00 PM)</option>
+                <option value="3">Night (08:00 PM – 01:00 AM)</option>
+              </select>
+            </div>
+            <div class="form-group search-btn-group">
+              <label>&nbsp;</label>
+              <button type="submit" class="btn btn-dark search-submit-btn">
+                Search Halls →
+              </button>
+            </div>
+          </div>
+
+          <div class="sector-chips-bar">
+            <span class="quick-dates-label">Popular Sectors:</span>
+            <div class="quick-dates-list" id="sector-chips">
+              <button type="button" class="quick-date-btn active" data-sector="F-7">F-7 (2)</button>
+              <button type="button" class="quick-date-btn" data-sector="E-11">E-11 (2)</button>
+              <button type="button" class="quick-date-btn" data-sector="G-11">G-11 (2)</button>
+              <button type="button" class="quick-date-btn" data-sector="F-10">F-10 (1)</button>
+              <button type="button" class="quick-date-btn" data-sector="I-8">I-8 (1)</button>
+              <button type="button" class="quick-date-btn" data-sector="F-8">F-8 (1)</button>
+              <button type="button" class="quick-date-btn" data-sector="G-9">G-9 (1)</button>
+            </div>
+          </div>
+
+          <div id="search-error-box" class="form-error-box hidden" style="margin-top: 14px; margin-bottom: 0;"></div>
+        </form>
+      </section>
+
+      <!-- Featured 3 Available Halls -->
+      <section class="section">
+        <div class="section-header-row">
+          <div>
+            <h2>Featured Available Halls</h2>
+            <p class="section-subtitle">Quick picks available today, or search above to browse all 10 Islamabad halls.</p>
+          </div>
+          <button type="button" id="home-view-all-btn" class="btn btn-outline">View All 10 Halls →</button>
+        </div>
+        <div id="home-featured-halls" class="halls-grid"></div>
+      </section>
+
+      <!-- Your Reservations Box -->
+      <section id="reservations-section" class="section">
+        <div class="section-header">
+          <h2>Your Reservations</h2>
+          <p class="section-subtitle">Saved reservations from bookings.txt. Search, sort, inspect receipts, or manage custom requests.</p>
+        </div>
+
+        <div class="card bookings-card">
+          <div class="bookings-toolbar">
+            <div class="search-input-wrap">
+              <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <input id="bookings-search" type="text" class="form-control search-input" placeholder="Search by Booking ID, Name, or Occasion..." />
+            </div>
+
+            <select id="bookings-hall-filter" class="form-control hall-filter-select">
+              <option value="0">All Halls</option>
+            </select>
+
+            <button type="button" id="sort-date-btn" class="btn btn-outline toolbar-btn">⇅ Sort by Date</button>
+            <button type="button" id="sort-cost-btn" class="btn btn-outline toolbar-btn">$ Sort by Cost</button>
+            <button type="button" id="refresh-bookings-btn" class="btn btn-outline icon-only-btn" title="Refresh" aria-label="Refresh">↻</button>
+          </div>
+
+          <div class="table-responsive">
+            <table class="bookings-table">
+              <thead>
+                <tr>
+                  <th>BOOKING ID</th>
+                  <th>CLIENT</th>
+                  <th>EVENT DATE</th>
+                  <th>SLOT</th>
+                  <th>HALL</th>
+                  <th>OCCASION &amp; THEME</th>
+                  <th>GUESTS</th>
+                  <th>DISCOUNT</th>
+                  <th>TOTAL</th>
+                  <th>ACTIONS</th>
+                </tr>
+              </thead>
+              <tbody id="bookings-body"></tbody>
+            </table>
+          </div>
+
+          <div class="bookings-footer">
+            <div>Your Reservations: <strong id="footer-bookings-count">0</strong></div>
+            <div>Total Amount: <strong id="footer-total-amount">Rs. 0</strong></div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- ==================== VIEW 2: SEARCH RESULTS (BUBBLE SORTED) ==================== -->
+    <div id="view-search-results" class="hidden">
+      <div class="page-top-bar">
+        <button type="button" class="btn btn-outline back-home-btn">← Back to Home</button>
+        <div id="search-summary-pill" class="pill pill-amber"></div>
+      </div>
+
+      <div class="section-header">
+        <h2>Sorted Hall Results</h2>
+        <p class="section-subtitle">
+          Ranked via Bubble Sort: exact sector &amp; filter matches at the top, followed by closest matching sectors below. Click any hall to customize your booking.
+        </p>
+      </div>
+
+      <div id="search-results-list" class="results-list"></div>
+    </div>
+
+    <!-- ==================== VIEW 3: CONFIGURE THEME, OCCASION, PERKS & MENU ==================== -->
+    <div id="view-configure" class="hidden">
+      <div class="page-top-bar">
+        <button type="button" id="cfg-back-btn" class="btn btn-outline">← Back</button>
+        <div class="stepper">
+          <span class="step done">1. Select Hall</span>
+          <span class="step active">2. Theme, Occasion &amp; Menu</span>
+          <span class="step">3. Checkout &amp; Billing</span>
+        </div>
+      </div>
+
+      <div class="card selected-hall-banner" id="cfg-hall-banner"></div>
+
+      <form id="configure-form" class="configure-grid" novalidate>
+        <!-- Left Column: Date, Slot, Guests, Theme, Occasion, Custom Request -->
+        <div class="card booking-form-card">
+          <div class="form-section">
+            <h3 class="form-section-title">Date, Time Slot &amp; Guest Count</h3>
+            <div class="date-selects-row">
+              <div class="form-group">
+                <label for="cfg-day">Day</label>
+                <select id="cfg-day" class="form-control"></select>
+              </div>
+              <div class="form-group">
+                <label for="cfg-month">Month</label>
+                <select id="cfg-month" class="form-control"></select>
+              </div>
+              <div class="form-group">
+                <label for="cfg-year">Year</label>
+                <select id="cfg-year" class="form-control"></select>
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-top: 14px;">
+              <label>Select Available Time Slot</label>
+              <div class="slot-selector" id="cfg-slot-selector"></div>
+            </div>
+
+            <div class="form-group" style="margin-top: 14px;">
+              <label for="cfg-guests" id="cfg-guests-label">Number of Guests</label>
+              <input id="cfg-guests" type="number" class="form-control" min="1" required />
+              <small id="cfg-discount-hint" class="field-hint"></small>
+            </div>
+          </div>
+
+          <hr class="divider" />
+
+          <div class="form-section">
+            <h3 class="form-section-title">Hall Theme</h3>
+            <div class="slot-selector" id="cfg-theme-selector">
+              <button type="button" class="slot-option active" data-theme="Modern">
+                <span class="slot-option-name">Modern</span>
+                <span class="slot-option-time">Sleek LED &amp; minimalist stage</span>
+              </button>
+              <button type="button" class="slot-option" data-theme="Floral">
+                <span class="slot-option-name">Floral</span>
+                <span class="slot-option-time">Fresh roses &amp; garden drapes</span>
+              </button>
+              <button type="button" class="slot-option" data-theme="Royal">
+                <span class="slot-option-name">Royal</span>
+                <span class="slot-option-time">Gold chandeliers &amp; velvet</span>
+              </button>
+            </div>
+          </div>
+
+          <hr class="divider" />
+
+          <div class="form-section">
+            <h3 class="form-section-title">Event Occasion &amp; Free Special Perks</h3>
+            <div class="occasion-grid" id="cfg-occasion-selector">
+              <button type="button" class="slot-option active" data-occasion="Wedding">
+                <span class="slot-option-name">Wedding</span>
+                <span class="slot-option-time">Baraat / Walima / Mehndi</span>
+              </button>
+              <button type="button" class="slot-option" data-occasion="Birthday">
+                <span class="slot-option-name">Birthday</span>
+                <span class="slot-option-time">Celebration &amp; Kids Party</span>
+              </button>
+              <button type="button" class="slot-option" data-occasion="Event">
+                <span class="slot-option-name">Event (Seminar / Expo)</span>
+                <span class="slot-option-time">Corporate / Conference</span>
+              </button>
+              <button type="button" class="slot-option" data-occasion="Other">
+                <span class="slot-option-name">Other Occasion</span>
+                <span class="slot-option-time">Type your own occasion</span>
+              </button>
+            </div>
+
+            <div id="cfg-custom-occasion-wrap" class="form-group hidden" style="margin-top: 12px;">
+              <label for="cfg-custom-occasion">Specify Occasion <span class="req">*</span></label>
+              <input id="cfg-custom-occasion" type="text" class="form-control" placeholder="e.g., Anniversary, Graduation, Engagement" />
+            </div>
+
+            <div class="perks-banner" id="cfg-perks-banner">
+              <span class="pill pill-amber">FREE SPECIAL PERK</span>
+              <div id="cfg-perks-text" class="perks-text">Free Sound System &amp; Live DJ + Bridal Stage Lighting</div>
+            </div>
+          </div>
+
+          <hr class="divider" />
+
+          <div class="form-section">
+            <h3 class="form-section-title">Separate Custom Request (Optional)</h3>
+            <div class="form-group">
+              <label for="cfg-custom-request">Special Request (approved only if accepted)</label>
+              <textarea id="cfg-custom-request" class="form-control textarea-control" rows="2" placeholder="e.g., Extra projector screen, custom cake table, outdoor valet..."></textarea>
+              <small class="field-hint">Requests are saved as <strong>Pending</strong> until accepted in Reservations.</small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: Catering Menu + Proceed -->
+        <div class="card booking-form-card">
+          <div class="form-section">
+            <h3 class="form-section-title">Choose Catering Menu Package</h3>
+            <p class="section-subtitle" style="margin-bottom: 14px;">Per-guest catering rates. Weekend bookings (Sat/Sun) add a flat Rs. 25,000 surcharge.</p>
+            <div id="cfg-menu-selector" class="menu-cards-stack"></div>
+          </div>
+
+          <div id="cfg-error-box" class="form-error-box hidden"></div>
+
+          <button type="submit" class="btn btn-dark btn-full">
+            Proceed to Checkout &amp; Billing →
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- ==================== VIEW 4: CHECKOUT & BILLING ==================== -->
+    <div id="view-checkout" class="hidden">
+      <div class="page-top-bar">
+        <button type="button" id="chk-back-btn" class="btn btn-outline">← Back to Customize</button>
+        <div class="stepper">
+          <span class="step done">1. Select Hall</span>
+          <span class="step done">2. Theme, Occasion &amp; Menu</span>
+          <span class="step active">3. Checkout &amp; Billing</span>
+        </div>
+      </div>
+
+      <div class="booking-layout">
+        <form id="checkout-form" class="card booking-form-card" novalidate>
+          <h3 class="form-section-title">Client Information &amp; Confirmation</h3>
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label for="chk-client-name">Client Name <span class="req">*</span></label>
+              <input id="chk-client-name" type="text" class="form-control" placeholder="e.g., Ayesha Khan" required />
+            </div>
+            <div class="form-group">
+              <label for="chk-client-phone">Phone Number <span class="req">*</span></label>
+              <input id="chk-client-phone" type="text" class="form-control" value="+923001234567" placeholder="+923001234567" required />
+              <small class="field-hint">10–15 digits (optional leading +)</small>
+            </div>
+          </div>
+
+          <hr class="divider" />
+
+          <h3 class="form-section-title">Selected Event Summary</h3>
+          <div id="checkout-summary-box" class="summary-grid"></div>
+
+          <div id="checkout-error-box" class="form-error-box hidden" style="margin-top: 16px;"></div>
+
+          <button type="submit" class="btn btn-dark btn-full" style="margin-top: 18px;">
+            Confirm &amp; Book Hall →
+          </button>
+        </form>
+
+        <!-- Final Billing Receipt Preview -->
+        <aside class="card cost-card">
+          <h3 class="cost-title">
+            <span class="title-icon-amber">$</span>
+            Billing Summary
+          </h3>
+
+          <div class="cost-rows">
+            <div class="cost-row">
+              <div>
+                <div class="cost-label">Hall Base Price</div>
+                <div class="cost-sublabel" id="bill-hall-name">—</div>
+              </div>
+              <div class="cost-val" id="bill-hall-price">Rs. 0</div>
+            </div>
+
+            <div class="cost-row">
+              <div>
+                <div class="cost-label">Catering Subtotal</div>
+                <div class="cost-sublabel" id="bill-catering-detail">—</div>
+              </div>
+              <div class="cost-val" id="bill-catering-price">Rs. 0</div>
+            </div>
+
+            <div class="cost-row">
+              <div>
+                <div class="cost-label">Weekend Surcharge</div>
+                <div class="cost-sublabel" id="bill-weekend-detail">—</div>
+              </div>
+              <div class="cost-val" id="bill-weekend-price">Rs. 0</div>
+            </div>
+
+            <div class="cost-row discount-row hidden" id="bill-discount-row">
+              <div>
+                <div class="cost-label" style="color: var(--green);">10% Bulk Guest Discount</div>
+                <div class="cost-sublabel">Guests &gt; 80% of hall capacity</div>
+              </div>
+              <div class="cost-val" style="color: var(--green);" id="bill-discount-price">-Rs. 0</div>
+            </div>
+          </div>
+
+          <hr class="divider" />
+
+          <div class="cost-total-row">
+            <span class="cost-total-label">Total Bill</span>
+            <span class="cost-total-val" id="bill-total-price">Rs. 0</span>
+          </div>
+
+          <ul class="validation-checklist">
+            <li id="val-phone" class="chk-item valid">
+              <span class="chk-icon">✓</span>
+              <span>Valid Phone (10–15 digits)</span>
+            </li>
+            <li id="val-capacity" class="chk-item valid">
+              <span class="chk-icon">✓</span>
+              <span id="val-capacity-text">Within Capacity</span>
+            </li>
+            <li id="val-slot" class="chk-item valid">
+              <span class="chk-icon">✓</span>
+              <span id="val-slot-text">Slot Available</span>
+            </li>
+          </ul>
+        </aside>
+      </div>
+    </div>
+
+    <!-- ==================== VIEW 5: ALL 10 HALLS DIRECTORY ==================== -->
+    <div id="view-all-halls" class="hidden">
+      <div class="page-top-bar">
+        <button type="button" class="btn btn-outline back-home-btn">← Back to Home</button>
+      </div>
+      <div class="section-header">
+        <h2>All 10 Marriage Halls Across Islamabad</h2>
+        <p class="section-subtitle">3 sectors with 2 halls (F-7, E-11, G-11) and 4 sectors with 1 hall each (F-10, I-8, F-8, G-9).</p>
+      </div>
+      <div id="all-halls-grid" class="halls-grid"></div>
+    </div>
+
+    <!-- ==================== VIEW 6: SLOT AVAILABILITY MATRIX ==================== -->
+    <div id="view-matrix" class="hidden">
+      <div class="page-top-bar">
+        <button type="button" class="btn btn-outline back-home-btn">← Back to Home</button>
+      </div>
+      <div class="section-header">
+        <h2>Slot Availability Matrix (All 10 Halls)</h2>
+        <p class="section-subtitle">Select a date to check Morning, Evening, and Night slots across all 10 Islamabad venues.</p>
+      </div>
+
+      <div class="card date-filter-card">
+        <div class="date-filter-top">
+          <div class="date-filter-title-wrap">
+            <div>
+              <div class="date-filter-title">Select Date</div>
+              <div class="date-filter-range">Allowed range: 2026 – 2035</div>
+            </div>
+          </div>
+          <span id="matrix-weekend-badge" class="pill pill-amber">• Weekend (+Rs. 25,000 Surcharge)</span>
+        </div>
+
+        <div class="date-selects-row">
+          <div class="form-group">
+            <label for="matrix-day">Day</label>
+            <select id="matrix-day" class="form-control"></select>
+          </div>
+          <div class="form-group">
+            <label for="matrix-month">Month</label>
+            <select id="matrix-month" class="form-control"></select>
+          </div>
+          <div class="form-group">
+            <label for="matrix-year">Year</label>
+            <select id="matrix-year" class="form-control"></select>
+          </div>
+        </div>
+
+        <div class="quick-dates-bar">
+          <div class="quick-dates-left">
+            <span class="quick-dates-label">Quick Dates:</span>
+            <div class="quick-dates-list">
+              <button type="button" class="quick-date-btn matrix-qdate active" data-day="15" data-month="11" data-year="2026">15 Nov 2026</button>
+              <button type="button" class="quick-date-btn matrix-qdate" data-day="20" data-month="11" data-year="2026">20 Nov 2026</button>
+              <button type="button" class="quick-date-btn matrix-qdate" data-day="22" data-month="11" data-year="2026">22 Nov 2026</button>
+              <button type="button" class="quick-date-btn matrix-qdate" data-day="25" data-month="12" data-year="2026">25 Dec 2026</button>
+            </div>
+          </div>
+          <div class="availability-counts">
+            <span id="matrix-available-count" class="count-available">28 Available</span>
+            <span class="count-sep">/</span>
+            <span id="matrix-booked-count" class="count-booked">2 Booked</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card matrix-table-card">
+        <div class="table-responsive">
+          <table class="matrix-table">
+            <thead>
+              <tr>
+                <th>Hall &amp; Sector</th>
+                <th><div class="slot-col-title">Morning</div><div class="slot-col-time">09:00 AM – 02:00 PM</div></th>
+                <th><div class="slot-col-title">Evening</div><div class="slot-col-time">03:00 PM – 07:00 PM</div></th>
+                <th><div class="slot-col-title">Night</div><div class="slot-col-time">08:00 PM – 01:00 AM</div></th>
+              </tr>
+            </thead>
+            <tbody id="matrix-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div>
+        <div class="footer-brand">Hall Booking System</div>
+        <div class="footer-sub">Islamabad Marriage Hall &amp; Event Reservation Platform</div>
+      </div>
+      <div class="footer-copy">© 2026 Hall Booking System</div>
+    </div>
+  </footer>
+
+  <!-- RECEIPT / CONFIRMATION MODAL -->
+  <div id="receipt-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true">
+    <div class="modal-card modal-card-lg">
+      <div class="modal-header">
+        <h3 id="receipt-modal-title">Booking Receipt</h3>
+        <button type="button" class="modal-close" data-close-modal="receipt-modal" aria-label="Close">×</button>
+      </div>
+      <div id="receipt-modal-body" class="modal-body"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" onclick="window.print()">Print Receipt</button>
+        <button type="button" class="btn btn-dark" data-close-modal="receipt-modal">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- EDIT BOOKING MODAL -->
+  <div id="edit-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true">
+    <div class="modal-card modal-card-lg">
+      <div class="modal-header">
+        <h3 id="edit-modal-title">Edit Reservation</h3>
+        <button type="button" class="modal-close" data-close-modal="edit-modal" aria-label="Close">×</button>
+      </div>
+      <form id="edit-booking-form" class="modal-body">
+        <input type="hidden" id="edit-id" />
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label for="edit-name">Client Name *</label>
+            <input id="edit-name" type="text" class="form-control" required />
+          </div>
+          <div class="form-group">
+            <label for="edit-phone">Phone Number *</label>
+            <input id="edit-phone" type="text" class="form-control" required />
+          </div>
+        </div>
+
+        <div class="date-selects-row" style="margin-top: 12px;">
+          <div class="form-group"><label for="edit-day">Day</label><select id="edit-day" class="form-control"></select></div>
+          <div class="form-group"><label for="edit-month">Month</label><select id="edit-month" class="form-control"></select></div>
+          <div class="form-group"><label for="edit-year">Year</label><select id="edit-year" class="form-control"></select></div>
+        </div>
+
+        <div class="form-grid-2" style="margin-top: 12px;">
+          <div class="form-group">
+            <label for="edit-slot">Time Slot</label>
+            <select id="edit-slot" class="form-control">
+              <option value="1">Morning (09:00 AM – 02:00 PM)</option>
+              <option value="2">Evening (03:00 PM – 07:00 PM)</option>
+              <option value="3">Night (08:00 PM – 01:00 AM)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="edit-hall">Hall</label>
+            <select id="edit-hall" class="form-control"></select>
+          </div>
+        </div>
+
+        <div class="form-grid-2" style="margin-top: 12px;">
+          <div class="form-group">
+            <label for="edit-guests">Guests</label>
+            <input id="edit-guests" type="number" class="form-control" min="1" required />
+          </div>
+          <div class="form-group">
+            <label for="edit-menu">Menu Package</label>
+            <select id="edit-menu" class="form-control"></select>
+          </div>
+        </div>
+
+        <div class="form-grid-2" style="margin-top: 12px;">
+          <div class="form-group">
+            <label for="edit-theme">Theme</label>
+            <select id="edit-theme" class="form-control">
+              <option value="Modern">Modern</option>
+              <option value="Floral">Floral</option>
+              <option value="Royal">Royal</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="edit-occasion">Occasion</label>
+            <input id="edit-occasion" type="text" class="form-control" required />
+          </div>
+        </div>
+
+        <div class="form-grid-2" style="margin-top: 12px;">
+          <div class="form-group">
+            <label for="edit-request">Separate Custom Request</label>
+            <input id="edit-request" type="text" class="form-control" placeholder="Optional" />
+          </div>
+          <div class="form-group">
+            <label for="edit-request-status">Request Approval Status</label>
+            <select id="edit-request-status" class="form-control">
+              <option value="Pending">Pending</option>
+              <option value="Accepted">Accepted</option>
+              <option value="Declined">Declined</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="edit-error-box" class="form-error-box hidden" style="margin-top: 12px;"></div>
+
+        <div class="modal-footer" style="padding: 16px 0 0;">
+          <button type="button" class="btn btn-outline" data-close-modal="edit-modal">Cancel</button>
+          <button type="submit" class="btn btn-dark">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

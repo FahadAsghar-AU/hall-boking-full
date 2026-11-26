@@ -1,0 +1,5 @@
+101|Ayesha & Bilal Khan|+923001234567|1|Grand Ballroom|15/11/2026|Evening|Wedding|Royal|250|3|Free Sound System & Live DJ + Bridal Stage Lighting|Extra floral stage backdrop|Accepted|80000|720000
+102|Fatima & Usman Tariq|+923219876543|3|Royal Palace|15/11/2026|Night|Wedding|Floral|450|2|Free Sound System & Live DJ + Bridal Stage Lighting||None|108500|976500
+103|Zainab & Hamza Malik|+923334567890|3|Royal Palace|20/11/2026|Evening|Wedding|Royal|400|3|Free Sound System & Live DJ + Bridal Stage Lighting||None|0|1250000
+104|Sana & Ahmed Raza|+923455678901|5|Imperial Arena|22/11/2026|Morning|Event|Modern|700|2|Free Dedicated Management Staff + Presentation Audio|2 cordless lapel mics for speakers|Pending|168500|1516500
+105|Maryam & Daniyal Siddiqui|+923126789012|1|Grand Ballroom|28/11/2026|Night|Birthday|Floral|280|1|Free Dancing Gorilla & Mascot + Sound System & DJ||None|51100|459900
